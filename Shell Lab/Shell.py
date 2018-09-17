@@ -99,5 +99,18 @@ while userInput != "exit":
         #Creates a list containing the user's inputs and is split by a space. Then, finds the redirection type
         #by analyzing this list.
         inputs = getCommand(userInput)
-        type = redirectionType(inputs)
-        forkIt(inputs,type)
+
+        #Will change the directory to whatever the user has specified using chdir
+        if inputs[0] == "cd":
+            try:
+                del inputs[0]
+                inputsToString = inputs[0]
+                del inputs[0]
+                for word in inputs:
+                    inputsToString = inputsToString + " " + word
+                os.chdir(inputsToString)
+            except FileNotFoundError:
+                print("Directory not found")
+        else:
+            type = redirectionType(inputs)
+            forkIt(inputs,type)
