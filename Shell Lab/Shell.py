@@ -1,5 +1,4 @@
 import os, sys
-from pathlib import Path
 
 #Tokenizer to create a list that splits the user's input so that it can later be
 #analyzed to determine what the user's command is.
@@ -47,7 +46,6 @@ def forkIt(inputs,type):
             fileName = inputs[len(inputs)-1]
             del inputs[len(inputs)-1]
             del inputs[len(inputs)-1]
-            print(inputs)
 
             # redirect child's stdout by closing FD1
             os.close(1)
@@ -63,9 +61,14 @@ def forkIt(inputs,type):
             fileName = inputs[len(inputs) - 1]
             del inputs[len(inputs) - 1]
             del inputs[len(inputs) - 1]
-            print(inputs)
 
-
+            # redirect child's stdin by closing FD0
+            os.close(0)
+            # opening the user's file so that it can read the input from the given file
+            sys.stdin = open(fileName, "r")
+            fd = sys.stdin.fileno()
+            os.set_inheritable(fd, True)
+            os.write(2, ("Child: opened fd=%d for reading\n" % fd).encode())
 
         for dir in re.split(":", os.environ['PATH']):  # try each directory in the path
             program = "%s/%s" % (dir, inputs[0])
@@ -76,8 +79,6 @@ def forkIt(inputs,type):
                 pass  # ...fail quietly
 
         os.write(2, ("Child:    Could not exec %s\n" % inputs[0]).encode())
-        path = os.path.abspath(inputs[0])
-        print("Path is",path)
         sys.exit(1)  # terminate with error
 
     else:  # parent (forked ok)
