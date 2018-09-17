@@ -23,6 +23,7 @@ def redirectionType(userInput):
 def forkIt(inputs,type):
     import os, sys, time, re
 
+
     pid = os.getpid()
 
    # os.write(1, ("About to fork (pid:%d)\n" % pid).encode())
@@ -94,7 +95,7 @@ userInput = "start"
 while userInput != "exit":
     userInput = input("$")
     if userInput == "exit":
-        os.exit()
+        exit()
     else:
         #Creates a list containing the user's inputs and is split by a space. Then, finds the redirection type
         #by analyzing this list.
@@ -111,6 +112,7 @@ while userInput != "exit":
                 os.chdir(inputsToString)
             except FileNotFoundError:
                 print("Directory not found")
+
         else:
             type = redirectionType(inputs)
             forkIt(inputs,type)
