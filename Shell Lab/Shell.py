@@ -26,8 +26,6 @@ def forkIt(inputs,type):
 
     pid = os.getpid()
 
-   # os.write(1, ("About to fork (pid:%d)\n" % pid).encode())
-
     rc = os.fork()
 
     if rc < 0:
@@ -35,9 +33,7 @@ def forkIt(inputs,type):
         sys.exit(1)
 
     elif rc == 0:  # child
-      #  os.write(1, ("Child: My pid==%d.  Parent's pid=%d\n" %
-      #               (os.getpid(), pid)).encode())
-
+      
         #The user wants to do output redirection. So will close FD1 so that instead of outputing the
         #results of the user's command to the display, it will output it to the specified input.
         if type == "output":
@@ -48,9 +44,12 @@ def forkIt(inputs,type):
             del inputs[len(inputs)-1]
             del inputs[len(inputs)-1]
 
-            # redirect child's stdout by closing FD1
+            # redirect child's stdout by closing FD1 so that  instead of displaying on the screen,
+            # will display into the given file
             os.close(1)
-            # opening the user's file so that the command's output can be written to this location
+
+            # opening the user's file so that the command's output can be written to this location,
+            # the FD1 is now attached to the file name instead of the display.
             sys.stdout = open(fileName, "w")
             fd = sys.stdout.fileno()
             os.set_inheritable(fd, True)
@@ -83,8 +82,6 @@ def forkIt(inputs,type):
         sys.exit(1)  # terminate with error
 
     else:  # parent (forked ok)
-       # os.write(1, ("Parent: My pid=%d.  Child's pid=%d\n" %
-       #              (pid, rc)).encode())
         childPidCode = os.wait()
         os.write(1, ("Parent: Child %d terminated with exit code %d\n" %
                      childPidCode).encode())
