@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os, sys
 
 #Tokenizer to create a list that splits the user's input so that it can later be
@@ -22,7 +23,6 @@ def redirectionType(userInput):
 
 def forkIt(inputs,type):
     import os, sys, time, re
-
 
     pid = os.getpid()
 
@@ -90,7 +90,11 @@ def forkIt(inputs,type):
 
 userInput = "start"
 while userInput != "exit":
-    userInput = input("$")
+
+
+    psvar = (os.environ["PS1"])
+    userInput = input(psvar)
+
     if userInput == "exit":
         exit()
     else:
@@ -110,6 +114,11 @@ while userInput != "exit":
             except FileNotFoundError:
                 print("Directory not found")
 
+        elif inputs[0][0] == "/":
+            try:
+                os.execv(inputs[0], inputs)
+            except FileNotFoundError:
+                pass
         else:
             type = redirectionType(inputs)
             forkIt(inputs,type)
