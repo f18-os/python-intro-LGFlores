@@ -20,6 +20,22 @@ def redirectionType(userInput):
             return type
     return type
 
+#will change the user's directory.
+def cd(inputs):
+    try:
+        del inputs[0]
+        inputsToString = inputs[0]
+
+        #user wants to navigate to home directory
+        if inputsToString == "~":
+            os.chdir(os.getenv("HOME"))
+        else:
+            del inputs[0]
+            for word in inputs:
+                inputsToString = inputsToString + " " + word
+            os.chdir(inputsToString)
+    except FileNotFoundError:
+        print("Directory not found")
 
 def forkIt(inputs,type):
     import os, sys, time, re
@@ -55,6 +71,12 @@ def forkIt(inputs,type):
             os.set_inheritable(fd, True)
             os.write(2, ("Child: opened fd=%d for writing\n" % fd).encode())
 
+        elif type == "direct path":
+            try:
+                os.execv(inputs[0], inputs)
+            except FileNotFoundError:
+                pass
+            return
 
         elif type == "input":
 
@@ -89,10 +111,12 @@ def forkIt(inputs,type):
 
 
 userInput = "start"
+if "PS1" in os.environ:
+    psvar = (os.environ["PS1"])
+else:
+    psvar = "$"
 while userInput != "exit":
 
-
-    psvar = (os.environ["PS1"])
     userInput = input(psvar)
 
     if userInput == "exit":
@@ -104,21 +128,11 @@ while userInput != "exit":
 
         #Will change the directory to whatever the user has specified using chdir
         if inputs[0] == "cd":
-            try:
-                del inputs[0]
-                inputsToString = inputs[0]
-                del inputs[0]
-                for word in inputs:
-                    inputsToString = inputsToString + " " + word
-                os.chdir(inputsToString)
-            except FileNotFoundError:
-                print("Directory not found")
+            cd(inputs)
 
+        #User has specified a direct path to a file, so need to exec that path instead of looking for the path
         elif inputs[0][0] == "/":
-            try:
-                os.execv(inputs[0], inputs)
-            except FileNotFoundError:
-                pass
+            forkIt(inputs, "direct path")
         else:
             type = redirectionType(inputs)
             forkIt(inputs,type)
