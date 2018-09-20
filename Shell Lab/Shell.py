@@ -20,6 +20,20 @@ def redirectionType(userInput):
             return type
     return type
 
+def hasSpace(userInput):
+    iterator = 0
+    newCommand = []
+    for word in userInput:
+        if word == "\\n":
+            newCommand = [userInput[iterator+1]]
+            del userInput[iterator]
+            del userInput[iterator]
+        iterator+=1
+
+    return newCommand
+
+
+
 #will change the user's directory.
 def cd(inputs):
     try:
@@ -111,13 +125,16 @@ def forkIt(inputs,type):
 
 
 userInput = "start"
+commandQueue = []
 if "PS1" in os.environ:
     psvar = (os.environ["PS1"])
 else:
     psvar = "$"
+
 while userInput != "exit":
 
     userInput = input(psvar)
+
 
     if userInput == "exit":
         exit()
@@ -136,3 +153,6 @@ while userInput != "exit":
         else:
             type = redirectionType(inputs)
             forkIt(inputs,type)
+
+
+
